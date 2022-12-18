@@ -1,0 +1,139 @@
+<?php
+include('includes/header.php');
+$userId = $_SESSION['uId'];
+?>
+
+<?php
+if (isset($_GET['name'])) {
+	if (!empty($_GET['name'])) {
+		$paralLink = $_GET['name'];
+		$sql = "SELECT * from event where paralLink = '$paralLink'";
+		$result = mysqli_query($con,$sql);
+		$row = mysqli_fetch_array($result);
+
+		$sellerId = $row['sellerId'];
+
+		$check = "SELECT * from seller where id = '$sellerId'";
+		$res = mysqli_query($con,$check);
+		$rs = mysqli_fetch_array($res);
+
+		if ($row['event_price'] == 0) {
+			$submitButtonName = 'free';
+		} else {
+			$submitButtonName = 'paid';
+		}
+		
+		if($row['event_price'] == 0){
+		    $text = '';
+		    $price = "FREE";
+		} else {
+		    $text = '& Pay';
+		    $price = "₹".$row['event_price'];
+		}
+?>
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<form method="POST" action="pay.php">
+
+						<div class="col-md-7">
+							<!-- Billing Details -->
+							<div class="billing-details">
+								<div class="section-title">
+									<h3 class="title">Billing address</h3>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="customerName" placeholder="Name" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="email" name="customerEmail" placeholder="Email" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="address" placeholder="Address" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="city" placeholder="City" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="country" placeholder="Country" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="zip" placeholder="ZIP Code" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="tel" name="customerPhone" placeholder="Telephone" required>
+								</div>
+								<div class="form-group">
+									<input class="input" type="text" name="referral" placeholder="Referral Code (Optional)">
+								</div>
+								<input type="hidden" name="eventName" value="<?= $row['event_name'] ?>">
+								<input type="hidden" name="paramLink" value="<?= $row['paralLink'] ?>">
+								<input type="hidden" name="orderAmount" value="<?= $row['event_price'] ?>">
+								<input type="hidden" name="event_id" value="<?= $row['event_id'] ?>"><input type="hidden" name="appId" value="5779879ef317c79dca0ba371b89775" />
+								<input type="hidden" name="orderId" value="<?= 'ORDS-EVRG-'.date('mdY').'-'.rand(0000,999999) ?>">
+								<input type="hidden" name="orderNote" value="<?= $userId ?>">
+								<input type="hidden" name="returnUrl" value="https://goeventer.in/thankyou.php">
+								<input type="hidden" name="orderCurrency" value="INR">
+								<input type="hidden" name="sellerId" value="<?= $sellerId ?>">
+							</div>
+							<!-- /Billing Details -->
+						</div>
+
+						<!-- Order Details -->
+						<div class="col-md-5 order-details">
+							<div class="section-title text-center">
+								<h3 class="title">Your Order</h3>
+							</div>
+							<div class="order-summary">
+								<div class="order-col">
+									<div><strong>EVENT</strong></div>
+									<div><strong>PRICE</strong></div>
+								</div>
+								<div class="order-products">
+									<div class="order-col">
+										<div><?= $row['event_name'] ?><br>Location: <?= $row['event_location'] ?></div>
+										<div><?= $price ?></div>
+									</div>
+								</div>
+								<div class="order-col">
+									<div><strong>TOTAL</strong></div>
+									<div><strong class="order-total"><?= $price ?></strong></div>
+								</div>
+							</div>
+							<div class="input-checkbox">
+								<input type="checkbox" id="terms" required>
+								<label for="terms">
+									<span></span>
+									I've read and accept the terms & conditions
+								</label>
+							</div>
+							
+							<input type="submit" class="primary-btn order-submit" name="<?= $submitButtonName ?>" value="Confirm Registration <?= $text ?>">
+						</div>
+						<!-- /Order Details -->
+
+					</form>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+<?php
+	} else {
+		echo "<script>window.location.href='events.php';</script>";
+	}
+} else {
+	echo "<script>window.location.href='events.php';</script>";
+}
+?>
+
+<?php
+include('includes/footer.php');
+?>
